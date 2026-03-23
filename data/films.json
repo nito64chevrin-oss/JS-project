@@ -1,0 +1,22 @@
+[
+  { "titre": "Inception", "note": 8.8, "annee": 2010, "duree": 148, "genre": "Science-Fiction", "realisateur": "Christopher Nolan", "budget": 160000000 },
+  { "titre": "Interstellar", "note": 8.6, "annee": 2014, "duree": 169, "genre": "Science-Fiction", "realisateur": "Christopher Nolan", "budget": 165000000 },
+  { "titre": "The Dark Knight", "note": 9.0, "annee": 2008, "duree": 152, "genre": "Action", "realisateur": "Christopher Nolan", "budget": 185000000 },
+  { "titre": "Parasite", "note": 8.5, "annee": 2019, "duree": 132, "genre": "Thriller", "realisateur": "Bong Joon-ho", "budget": 11400000 },
+  { "titre": "Pulp Fiction", "note": 8.9, "annee": 1994, "duree": 154, "genre": "Crime", "realisateur": "Quentin Tarantino", "budget": 8000000 },
+  { "titre": "The Godfather", "note": 9.2, "annee": 1972, "duree": 175, "genre": "Crime", "realisateur": "Francis Ford Coppola", "budget": 6000000 },
+  { "titre": "Forrest Gump", "note": 8.8, "annee": 1994, "duree": 142, "genre": "Drame", "realisateur": "Robert Zemeckis", "budget": 55000000 },
+  { "titre": "The Matrix", "note": 8.7, "annee": 1999, "duree": 136, "genre": "Science-Fiction", "realisateur": "Lana Wachowski", "budget": 63000000 },
+  { "titre": "Schindler's List", "note": 8.9, "annee": 1993, "duree": 195, "genre": "Histoire", "realisateur": "Steven Spielberg", "budget": 22000000 },
+  { "titre": "Fight Club", "note": 8.8, "annee": 1999, "duree": 139, "genre": "Thriller", "realisateur": "David Fincher", "budget": 63000000 },
+  { "titre": "Goodfellas", "note": 8.7, "annee": 1990, "duree": 146, "genre": "Crime", "realisateur": "Martin Scorsese", "budget": 25000000 },
+  { "titre": "The Silence of the Lambs", "note": 8.6, "annee": 1991, "duree": 118, "genre": "Thriller", "realisateur": "Jonathan Demme", "budget": 19000000 },
+  { "titre": "Avatar", "note": 7.8, "annee": 2009, "duree": 162, "genre": "Science-Fiction", "realisateur": "James Cameron", "budget": 237000000 },
+  { "titre": "Titanic", "note": 7.9, "annee": 1997, "duree": 194, "genre": "Romance", "realisateur": "James Cameron", "budget": 200000000 },
+  { "titre": "The Lion King", "note": 8.5, "annee": 1994, "duree": 88, "genre": "Animation", "realisateur": "Roger Allers", "budget": 45000000 },
+  { "titre": "Gladiator", "note": 8.5, "annee": 2000, "duree": 155, "genre": "Action", "realisateur": "Ridley Scott", "budget": 103000000 },
+  { "titre": "The Shawshank Redemption", "note": 9.3, "annee": 1994, "duree": 142, "genre": "Drame", "realisateur": "Frank Darabont", "budget": 25000000 },
+  { "titre": "Se7en", "note": 8.6, "annee": 1995, "duree": 127, "genre": "Thriller", "realisateur": "David Fincher", "budget": 33000000 },
+  { "titre": "The Prestige", "note": 8.5, "annee": 2006, "duree": 130, "genre": "Mystere", "realisateur": "Christopher Nolan", "budget": 40000000 },
+  { "titre": "Inglourious Basterds", "note": 8.3, "annee": 2009, "duree": 153, "genre": "Guerre", "realisateur": "Quentin Tarantino", "budget": 70000000 }
+]
