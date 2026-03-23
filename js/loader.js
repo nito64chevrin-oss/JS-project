@@ -47,17 +47,6 @@ function parserCSV (csv) {
   return res
 }
 
-function GetStaticData (file) {
-  const res = []
-  const parserFile = parserCSV(file)
-  for (let i = 0; i < parserFile.length; i++) {
-    if (typeof parserFile[i] == "number") {
-
-    }
-  }
-
-}
-
 // Va vérifier si il s'agit d'une URL
 function estUneURL(texte) {
   try {
@@ -84,12 +73,13 @@ document.getElementById('monFichier').addEventListener('change', async (e) => {
   const file = e.target.files[0];
 
   if (!file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
-    console.error("Fichier non supporté");
+    testfile.textContent = "Fichier non supporté";
     return;
   }
   const resfile = await loadFromFile(file);
   if (file.name.endsWith('.csv')){
     testfile.textContent = JSON.stringify(parserCSV(resfile), null, 2)
+    dataset = parserCSV(texte)
   }
   else {
     testfile.textContent = resfile
