@@ -1,3 +1,5 @@
+test = document.getElementById('statFile');
+
 // Va créer un obj de chaque valeur des colonnes qui contiennent des typeof = à "number"
 function GetStaticData(file) {
   const res = {}
@@ -38,7 +40,7 @@ function minimum(colonnes) {
         }
         res[colonne] = min 
     }
-    return min
+    return res
 }
 
 function maximum(colonnes) {
@@ -52,7 +54,7 @@ function maximum(colonnes) {
         }
         res[colonne] = max
     }
-    return max
+    return res
 }
 
 function mediane(colonnes) {
@@ -81,4 +83,26 @@ function ecart_type(colonnes) {
     res[colonne] = Math.sqrt(moyenne(carres))
   }
   return res
+}
+
+function ExhibitStat(file) {
+    const colonnes = GetStaticData(file)
+    for (let colonne in colonnes) {
+        const moy = moyenne(colonnes)
+        const min = minimum(colonnes)
+        const max = maximum(colonnes)
+        const median = mediane(colonnes)
+        const ecarttype = ecart_type(colonnes)
+    }
+    for (let colonne in colonnes) {
+        test.innerHTML += `
+        <p>${colonne} → 
+            moy: ${moy[colonne]} | 
+            min: ${min[colonne]} | 
+            max: ${max[colonne]}
+            mediane: ${median[colonne]}
+            écart-type: ${ecarttype[colonne]}
+        </p>
+        `
+  }
 }

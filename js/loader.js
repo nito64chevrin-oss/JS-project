@@ -3,6 +3,7 @@ const boutonTexte = document.getElementById('btnAnalyserTexte');
 test = document.getElementById('test');
 test2 = document.getElementById('test2')
 testfile = document.getElementById('testfile')
+FileStat = document.getElementById('statFile')
 
 async function loadFromURL (url) {
     try {
@@ -79,7 +80,8 @@ document.getElementById('monFichier').addEventListener('change', async (e) => {
   const resfile = await loadFromFile(file);
   if (file.name.endsWith('.csv')){
     testfile.textContent = JSON.stringify(parserCSV(resfile), null, 2)
-    dataset = parserCSV(texte)
+    dataset = parserCSV(resfile)
+    FileStat.textContent = ExhibitStat(dataset)
   }
   else {
     testfile.textContent = resfile

@@ -13,18 +13,31 @@
         <div class = URL-div>
             <input type="text" id="URL_finder" placeholder="Entrer URL">
             <button id="btnRechercheURL">Chercher</button>
-            <div>
+            <div class = show-result>
                 <p id = test></p>
+            </div>
+            <div class = stat>
+                <p id = "statURL"></p>
             </div>
         </div>
         </div class = file-div>
             <input type="file" id="monFichier">
-            <pre id="testfile"></pre>
+            <div class = show-result>
+                <pre id="testfile"></pre>
+            </div>
+            <div class = stat id = "statFile">
+                
+            </div>
         <div>
         <div class = CSV-div>
             <textarea id="texte_brut" placeholder="Colle ton CSV ou JSON ici..."></textarea>
             <button id="btnAnalyserTexte">Analyser</button>
-            <p id = test2></p>
+            <div class = show-result>
+                <p id = test2></p>
+            </div>
+            <div class = stat>
+                <p id = "statBrut"></p>
+            </div>
         </div>
     </main>
 </body>
