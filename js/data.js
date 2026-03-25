@@ -134,6 +134,10 @@ function formaterNombre(colonne, valeur) {
   return parseFloat(valeur.toFixed(2))
 }
 
+function normaliser(valeur, min, max) {
+  return (valeur - min) / (max - min)
+}
+
 function DisplayAllMovies(colonnes) {
   for (let i = 0; i < dataset.length; i++) {
     const bouton = document.createElement('button')
@@ -151,8 +155,8 @@ function DisplayAllCategories(colonnes) {
     bouton.textContent = `${colonne}`
     bouton.id = `btn-${colonne}`
     document.getElementById('display-catégorie').appendChild(bouton)
-}
   }
+}
 
 function ExhibitStat(file) {
   const colonnes = GetStaticData(file)
