@@ -6,11 +6,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <head class = Bottom-title>
+    <header class="Bottom-title">
         <h1>DataMind</h1>
-    </head>
+    </header>
+
     <main>
-        <div class = URL-div>
+        <div class="URL-div">
             <input type="text" id="URL_finder" placeholder="Entrer URL">
             <button id="btnRechercheURL">Chercher</button>
             <div class = show-result>
@@ -53,10 +54,35 @@
                 </div>
             </div>
         </div>
+
+        <section id="vizSection" class="viz-section" hidden>
+            <h2>Visualisation des donnees</h2>
+
+            <div class="chart-grid">
+                <article class="chart-card">
+                    <h3>Histogramme des notes</h3>
+                    <div id="histogramChart" class="histogram"></div>
+                </article>
+
+                <article class="chart-card">
+                    <h3>Top 10 des genres</h3>
+                    <div id="genreChart" class="horizontal-bars"></div>
+                </article>
+            </div>
+
+            <article id="tableWrapper" class="table-card">
+                <h3>Tableau triable et pagine</h3>
+                <div class="table-scroll">
+                    <table id="moviesTable"></table>
+                </div>
+                <div class="pager">
+                    <button id="prevPage" type="button">Precedent</button>
+                    <span id="pageInfo">Page 1/1</span>
+                    <button id="nextPage" type="button">Suivant</button>
+                </div>
+            </article>
+        </section>
     </main>
 </body>
 
-
-
-<script src="js/loader.js"></script>
-<script src="js/data.js"></script>
+<script type="module" src="js/loader.js"></script>
