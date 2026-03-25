@@ -1,32 +1,34 @@
-console.log("LOADER CHARGÉ");
+console.log('LOADER CHARGE');
 import { cleanDataset } from './data.js';
 import { renderVisualizations } from './visualization.js';
 
-const boutonurl = document.getElementById('btnRechercheURL');
+const boutonURL = document.getElementById('btnRechercheURL');
 const boutonTexte = document.getElementById('btnAnalyserTexte');
-test = document.getElementById('test');
-test2 = document.getElementById('test2')
-testfile = document.getElementById('testfile')
+const boutonRecherche = document.getElementById('btnRecherche');
 
-async function loadFromURL (url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error ( 'HTTP $ {response. status}');
-        const contentType = response.headers.get ('Content-Type') ;
-        if (contentType.includes ('json') ) {
-            return await response.json();
-        } else {
-            const text = await response.text();
-            return parseCSV(text); // Voir ci-dessous
-        }
-    } catch (error) {
-        console.error("Erreur de chargement :", error);
-    }
+const sortieURL = document.getElementById('test');
+const sortieTexte = document.getElementById('test2');
+const sortieFichier = document.getElementById('testfile');
+
+const listeFilms = document.getElementById('display-films');
+const sortieRecoTitre = document.getElementById('display-title');
+const sortieRecoCategorie = document.getElementById('display-catégorie');
+
+let currentDataset = [];
+
+async function loadFromURL(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const contentType = response.headers.get('Content-Type') || '';
+  if (contentType.includes('json')) {
+    return await response.json();
+  }
+
+  const text = await response.text();
+  return parseCSV(text);
 }
 
-// =======================
-// 🔹 Chargement fichier local
-// =======================
 function loadFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -36,86 +38,168 @@ function loadFromFile(file) {
   });
 }
 
-function loadFromText (rawText) { /* parser directement */ }
+function parseCSV(csv) {
+  const rows = csv.split(/\r?\n/).filter((line) => line.trim() !== '');
+  if (!rows.length) return [];
 
+  const headers = rows[0].split(',').map((h) => h.trim());
+  const result = [];
 
-function parserCSV (csv) {
-  const res = []
-  const lignes = csv.split('\n')
-  const names = lignes[0].split(',')
-  for (let i = 1; i < lignes.length ; i++) {
-    const Obj = {}
-    const categories = lignes[i].split(',')
-    for (let y in names) {
-      Obj[names[y]] = categories[y]
+  for (let i = 1; i < rows.length; i += 1) {
+    const values = rows[i].split(',');
+    const obj = {};
+
+    for (let j = 0; j < headers.length; j += 1) {
+      obj[headers[j]] = values[j]?.trim() ?? '';
     }
 
-    res.push(obj);
+    result.push(obj);
   }
 
-  return res;
+  return result;
 }
 
-function GetStaticData (file) {
-  const res = []
-  const parserFile = parserCSV(file)
-  for (let i = 0; i < parserFile.length; i++) {
-    if (typeof parserFile[i] == "number") {
+function parseTextInput(rawText) {
+  const input = rawText.trim();
+  if (!input) throw new Error('Aucun texte fourni');
 
-    }
-  }
-
-}
-
-// Va vérifier si il s'agit d'une URL
-function estUneURL(texte) {
   try {
-    new URL(texte);
+    const json = JSON.parse(input);
+    return Array.isArray(json) ? json : [json];
+  } catch {
+    return parseCSV(input);
+  }
+}
+
+function isURL(text) {
+  try {
+    new URL(text);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
 
+function updateRecommendations(data) {
+  currentDataset = Array.isArray(data) ? data : [];
 
-boutonurl.addEventListener('click', async () => { 
-  const valeururl = document.getElementById('URL_finder').value;
-  
-  if (estUneURL(valeururl)) {
-    const resulturl = await loadFromURL(valeururl);
-    test.textContent = JSON.stringify(resulturl);
-  } else {
-    test.textContent = "Il ne s'agit pas d'une URL";
-  }
-});
+  if (!listeFilms || !sortieRecoTitre || !sortieRecoCategorie) return;
 
-document.getElementById('monFichier').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
+  listeFilms.innerHTML = '';
+  sortieRecoTitre.innerHTML = '<p>Selectionne un film pour voir des recommandations.</p>';
+  sortieRecoCategorie.innerHTML = '';
 
-  if (!file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
-    console.error("Fichier non supporté");
+  currentDataset.slice(0, 30).forEach((movie) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = movie.title;
+    btn.addEventListener('click', () => showRecommendationsFor(movie));
+    listeFilms.appendChild(btn);
+  });
+}
+
+function showRecommendationsFor(selectedMovie) {
+  if (!sortieRecoTitre || !sortieRecoCategorie) return;
+
+  const byGenre = currentDataset
+    .filter((movie) => movie.title !== selectedMovie.title && movie.genre === selectedMovie.genre)
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 5);
+
+  const closeInRating = currentDataset
+    .filter((movie) => movie.title !== selectedMovie.title)
+    .sort((a, b) => Math.abs(a.rating - selectedMovie.rating) - Math.abs(b.rating - selectedMovie.rating))
+    .slice(0, 5);
+
+  sortieRecoTitre.innerHTML = `<h4>Film choisi: ${selectedMovie.title}</h4>`;
+
+  const genreList = byGenre.length
+    ? byGenre.map((m) => `<li>${m.title} (${m.genre}, note ${m.rating})</li>`).join('')
+    : '<li>Aucune recommandation de meme genre.</li>';
+
+  const ratingList = closeInRating.length
+    ? closeInRating.map((m) => `<li>${m.title} (note ${m.rating})</li>`).join('')
+    : '<li>Aucune recommandation proche en note.</li>';
+
+  sortieRecoCategorie.innerHTML = `
+    <h4>Suggestions par genre</h4>
+    <ul>${genreList}</ul>
+    <h4>Suggestions par note proche</h4>
+    <ul>${ratingList}</ul>
+  `;
+}
+
+function applyDataset(rawData, outputElement) {
+  const cleanData = cleanDataset(rawData);
+  outputElement.textContent = JSON.stringify(cleanData, null, 2);
+  renderVisualizations(cleanData);
+  updateRecommendations(cleanData);
+}
+
+boutonURL.addEventListener('click', async () => {
+  const valueURL = document.getElementById('URL_finder').value.trim();
+
+  if (!isURL(valueURL)) {
+    sortieURL.textContent = "Il ne s'agit pas d'une URL valide";
     return;
   }
-  const resfile = await loadFromFile(file);
-  if (file.name.endsWith('.csv')){
-    testfile.textContent = JSON.stringify(parserCSV(resfile), null, 2)
-  }
-  else {
-    testfile.textContent = resfile
-  }
-});
-
-
-
-boutonTexte.addEventListener('click', () => {
-  const texteColle = document.getElementById('texte_brut').value;
 
   try {
-    const data = parseTextInput(texteColle);
-    const cleanData = cleanDataset(data);
-    test2.textContent = JSON.stringify(cleanData, null, 2);
-    renderVisualizations(cleanData);
+    const data = await loadFromURL(valueURL);
+    applyDataset(data, sortieURL);
   } catch (error) {
-    test2.textContent = `Erreur d'analyse: ${error.message}`;
+    sortieURL.textContent = `Erreur URL: ${error.message}`;
   }
 });
+
+document.getElementById('monFichier').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+
+  if (!file) {
+    sortieFichier.textContent = 'Aucun fichier selectionne';
+    return;
+  }
+
+  if (!file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
+    sortieFichier.textContent = 'Fichier non supporte (.csv ou .json)';
+    return;
+  }
+
+  try {
+    const rawText = await loadFromFile(file);
+    const data = file.name.endsWith('.csv') ? parseCSV(rawText) : JSON.parse(rawText);
+    applyDataset(data, sortieFichier);
+  } catch (error) {
+    sortieFichier.textContent = `Erreur fichier: ${error.message}`;
+  }
+});
+
+boutonTexte.addEventListener('click', () => {
+  const rawText = document.getElementById('texte_brut').value;
+
+  try {
+    const data = parseTextInput(rawText);
+    applyDataset(data, sortieTexte);
+  } catch (error) {
+    sortieTexte.textContent = `Erreur d'analyse: ${error.message}`;
+  }
+});
+
+if (boutonRecherche) {
+  boutonRecherche.addEventListener('click', () => {
+    const query = String(document.getElementById('rechercheFilm')?.value || '').trim().toLowerCase();
+    if (!query) {
+      sortieRecoTitre.innerHTML = '<p>Entre un titre de film.</p>';
+      return;
+    }
+
+    const found = currentDataset.find((movie) => movie.title.toLowerCase().includes(query));
+    if (!found) {
+      sortieRecoTitre.innerHTML = '<p>Aucun film trouve avec cette recherche.</p>';
+      sortieRecoCategorie.innerHTML = '';
+      return;
+    }
+
+    showRecommendationsFor(found);
+  });
+}
