@@ -1,3 +1,7 @@
 .Bottom-title {
     margin: auto;
 }
+
+.cache{
+    display: none;
+}

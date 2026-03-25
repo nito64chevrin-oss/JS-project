@@ -1,5 +1,6 @@
 const boutonurl = document.getElementById('btnRechercheURL');
 const boutonTexte = document.getElementById('btnAnalyserTexte');
+const searchBarr = document.getElementById("btnRecherche")
 test = document.getElementById('test');
 test2 = document.getElementById('test2')
 testfile = document.getElementById('testfile')
@@ -35,7 +36,7 @@ function loadFromText (rawText) { /* parser directement */ }
 
 function parserCSV (csv) {
   const res = []
-  const lignes = csv.split('\n')
+  const lignes = csv.split('\n').filter(l => l.trim() !== '')
   const names = lignes[0].split(',')
   for (let i = 1; i < lignes.length ; i++) {
     const Obj = {}
@@ -58,7 +59,7 @@ function estUneURL(texte) {
   }
 }
 
-
+// URL
 boutonurl.addEventListener('click', async () => { 
   const valeururl = document.getElementById('URL_finder').value;
   
@@ -70,26 +71,34 @@ boutonurl.addEventListener('click', async () => {
   }
 });
 
+// File
 document.getElementById('monFichier').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-
+  const file = e.target.files[0]
   if (!file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
-    testfile.textContent = "Fichier non supporté";
-    return;
+    testfile.textContent = "Fichier non supporté"
+    return
   }
-  const resfile = await loadFromFile(file);
-  if (file.name.endsWith('.csv')){
-    testfile.textContent = JSON.stringify(parserCSV(resfile), null, 2)
-    dataset = parserCSV(resfile)
-    FileStat.textContent = ExhibitStat(dataset)
-  }
-  else {
+  const resfile = await loadFromFile(file)
+  const parsed = parserCSV(resfile)
+  dataset = validateAndClean(parsed)
+  DisplayAllMovies(dataset)
+  if (file.name.endsWith('.csv')) {
+    testfile.textContent = JSON.stringify(dataset, null, 2)
+    ExhibitStat(dataset)
+  } else {
     testfile.textContent = resfile
   }
-});
+})
 
+// Barre de recherche
+document.getElementById('btnRecherche').addEventListener('click', () => {
+  const recherche = document.getElementById('rechercheFilm').value
+  const filmsFiltres = rechercherFilms(dataset, recherche)
+  testfile.textContent = JSON.stringify(filmsFiltres, null, 2)
+  ExhibitStat(filmsFiltres)
+})
 
-
+// Text Brut
 boutonTexte.addEventListener('click', () => {
   const texteColle = document.getElementById('texte_brut').value;
   test2.textContent = texteColle;

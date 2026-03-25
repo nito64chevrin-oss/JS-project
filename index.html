@@ -20,15 +20,16 @@
                 <p id = "statURL"></p>
             </div>
         </div>
-        </div class = file-div>
+        <div class="file-div">
             <input type="file" id="monFichier">
-            <div class = show-result>
+            <div id="rch-File">
+                <input type="text" id="rechercheFilm" placeholder="Rechercher un film...">
+                <button id="btnRecherche">Rechercher</button>
+            </div>
                 <pre id="testfile"></pre>
+            <div id="filtre-File"></div>
+            <div id="statFile"></div>
             </div>
-            <div class = stat id = "statFile">
-                
-            </div>
-        <div>
         <div class = CSV-div>
             <textarea id="texte_brut" placeholder="Colle ton CSV ou JSON ici..."></textarea>
             <button id="btnAnalyserTexte">Analyser</button>
@@ -37,6 +38,19 @@
             </div>
             <div class = stat>
                 <p id = "statBrut"></p>
+            </div>
+        </div>
+        <div class = "Recommandation">
+            <div class = "title-recom">
+                <h1>Recomondation</h1>
+                <div class="choice" id ="display-films">
+                    
+                </div>
+                <div class="Film-similaire" id="display-title">  
+                </div>
+                <div class="Film-similaire" id="display-catégorie">
+                    <br>
+                </div>
             </div>
         </div>
     </main>
