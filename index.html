@@ -2,60 +2,111 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DataMind - Main Page</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="Bottom-title">
-        <h1>DataMind</h1>
+    <header class="hero">
+        <p class="hero-badge">Projet JS Data & IA</p>
+        <h1>DataMind Studio</h1>
+        <p>Explore tes films comme sur une plateforme streaming: chargement, stats live, recherche et recommandations.</p>
     </header>
 
-    <main>
-        <div class="URL-div">
-            <input type="text" id="URL_finder" placeholder="Entrer URL">
-            <button id="btnRechercheURL">Chercher</button>
-            <div class = show-result>
-                <p id = test></p>
+    <main class="layout">
+        <nav id="topActionBar" class="top-action-bar" hidden>
+            <button type="button" class="top-action-btn" data-scroll-id="topStatsBar">Stats</button>
+            <button type="button" class="top-action-btn" data-scroll-id="section-search">Recherche</button>
+            <button type="button" class="top-action-btn" data-scroll-id="section-reco">Recommandation</button>
+            <button type="button" class="top-action-btn" data-scroll-id="vizSection">Visualisations</button>
+            <button type="button" class="top-action-btn" data-scroll-id="section-tools">Outils</button>
+        </nav>
+
+        <section id="loadingWrap" class="loading-wrap" hidden>
+            <div class="loading-head">
+                <span id="loadingLabel">Chargement...</span>
+                <span id="loadingPercent">0%</span>
             </div>
-            <div class = stat>
-                <p id = "statURL"></p>
+            <div class="loading-track">
+                <div id="loadingBar" class="loading-bar"></div>
             </div>
-        </div>
-        <div class="file-div">
+        </section>
+
+        <section id="messageBox" class="message-box" hidden></section>
+
+        <section id="topStatsBar" class="top-stats" hidden>
+            <article class="top-stat-card">
+                <p>Films</p>
+                <h3 id="statTotalFilms">0</h3>
+            </article>
+            <article class="top-stat-card">
+                <p>Note moyenne</p>
+                <h3 id="statAverageRating">0.00</h3>
+            </article>
+            <article class="top-stat-card">
+                <p>Ecart-type note</p>
+                <h3 id="statStdRating">0.00</h3>
+            </article>
+            <article class="top-stat-card">
+                <p>Budget moyen</p>
+                <h3 id="statAverageBudget">$0M</h3>
+            </article>
+        </section>
+
+        <section id="section-tools" class="panel tools-panel">
+            <h2>Rapport & Exports</h2>
+            <div class="tools-grid">
+                <button id="btnGenerateReport" type="button">Generer rapport HTML</button>
+                <button id="btnExportFilteredJSON" type="button">Exporter JSON filtre</button>
+                <button id="btnExportAnalysisJSON" type="button">Exporter analyse JSON</button>
+                <button id="btnExportStatsCSV" type="button">Exporter stats CSV</button>
+                <button id="btnToggleTheme" type="button">Mode clair/sombre</button>
+            </div>
+        </section>
+
+        <section id="section-url" class="panel URL-div">
+            <h2>Chargement par URL</h2>
+            <div class="row">
+                <input type="text" id="URL_finder" placeholder="Entrer URL">
+                <button id="btnRechercheURL">Charger</button>
+            </div>
+            <pre id="test" class="output"></pre>
+            <p id="statURL"></p>
+        </section>
+
+        <section id="section-search" class="panel file-div">
+            <h2>Fichier & Recherche</h2>
             <input type="file" id="monFichier">
-            <div id="rch-File">
-                <input type="text" id="rechercheFilm" placeholder="Rechercher un film...">
+
+            <div id="rch-File" class="row">
+                <input type="text" id="rechercheFilm" placeholder="Rechercher un film (ex: the)">
                 <button id="btnRecherche">Rechercher</button>
             </div>
-                <pre id="testfile"></pre>
+
+            <div id="resultatRecherche"></div>
+            <pre id="testfile" class="output"></pre>
             <div id="filtre-File"></div>
             <div id="statFile"></div>
-            </div>
-        <div class = CSV-div>
+        </section>
+
+        <section id="section-text" class="panel CSV-div">
+            <h2>Texte Brut</h2>
             <textarea id="texte_brut" placeholder="Colle ton CSV ou JSON ici..."></textarea>
             <button id="btnAnalyserTexte">Analyser</button>
-            <div class = show-result>
-                <p id = test2></p>
-            </div>
-            <div class = stat>
-                <p id = "statBrut"></p>
-            </div>
-        </div>
-        <div class = "Recommandation">
-            <div class = "title-recom">
-                <h1>Recomondation</h1>
-                <div class="choice" id ="display-films">
-                    
-                </div>
-                <div class="Film-similaire" id="display-title">  
-                </div>
-                <div class="Film-similaire" id="display-catégorie">
-                    <br>
-                </div>
-            </div>
-        </div>
+            <pre id="test2" class="output"></pre>
+            <p id="statBrut"></p>
+        </section>
 
-        <section id="vizSection" class="viz-section" hidden>
+        <section id="section-reco" class="panel Recommandation">
+            <div class="title-recom">
+                <h2>Recommandation</h2>
+                <div class="choice" id="display-films"></div>
+                <div class="Film-similaire" id="display-title"></div>
+                <div class="Film-similaire" id="display-catégorie"></div>
+            </div>
+        </section>
+
+        <section id="vizSection" class="panel viz-section" hidden>
             <h2>Visualisation des donnees</h2>
 
             <div class="chart-grid">
