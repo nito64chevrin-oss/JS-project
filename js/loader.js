@@ -9,7 +9,6 @@ const btnGenerateReport = document.getElementById('btnGenerateReport');
 const btnExportFilteredJSON = document.getElementById('btnExportFilteredJSON');
 const btnExportAnalysisJSON = document.getElementById('btnExportAnalysisJSON');
 const btnExportStatsCSV = document.getElementById('btnExportStatsCSV');
-const btnToggleTheme = document.getElementById('btnToggleTheme');
 
 const sortieURL = document.getElementById('test');
 const sortieTexte = document.getElementById('test2');
@@ -440,15 +439,6 @@ if (btnExportStatsCSV) {
     const csv = toStatsCsv(currentAnalysis.stats);
     downloadFile(`stats_${Date.now()}.csv`, csv, 'text/csv;charset=utf-8');
     showMessage('success', 'Export CSV des statistiques termine.');
-  });
-}
-
-if (btnToggleTheme) {
-  btnToggleTheme.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-    const mode = document.body.classList.contains('light-mode') ? 'light' : 'dark';
-    localStorage.setItem('datamind-theme', mode);
-    showMessage('success', `Theme ${mode === 'light' ? 'clair' : 'sombre'} active.`);
   });
 }
 

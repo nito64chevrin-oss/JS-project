@@ -60,7 +60,6 @@
                 <button id="btnExportFilteredJSON" type="button">Exporter JSON filtre</button>
                 <button id="btnExportAnalysisJSON" type="button">Exporter analyse JSON</button>
                 <button id="btnExportStatsCSV" type="button">Exporter stats CSV</button>
-                <button id="btnToggleTheme" type="button">Mode clair/sombre</button>
             </div>
         </section>
 
@@ -103,6 +102,11 @@
                 <div class="choice" id="display-films"></div>
                 <div class="Film-similaire" id="display-title"></div>
                 <div class="Film-similaire" id="display-catégorie"></div>
+
+                <label for="valeurK">Nombre de films similaires :</label>
+                <input type="number" id="valeurK" value="5" min="1" class="cache">
+
+                <div id="display-knn"></div>
             </div>
         </section>
 
