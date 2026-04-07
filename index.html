@@ -69,7 +69,7 @@
                 <input type="text" id="URL_finder" placeholder="Entrer URL">
                 <button id="btnRechercheURL">Charger</button>
             </div>
-            <pre id="test" class="output"></pre>
+            <pre id="resultURL" class="output"></pre>
             <p id="statURL"></p>
         </section>
 
@@ -83,7 +83,7 @@
             </div>
 
             <div id="resultatRecherche"></div>
-            <pre id="testfile" class="output"></pre>
+            <pre id="resultFichier" class="output"></pre>
             <div id="filtre-File"></div>
             <div id="statFile"></div>
         </section>
@@ -92,7 +92,7 @@
             <h2>Texte Brut</h2>
             <textarea id="texte_brut" placeholder="Colle ton CSV ou JSON ici..."></textarea>
             <button id="btnAnalyserTexte">Analyser</button>
-            <pre id="test2" class="output"></pre>
+            <pre id="resultTexte" class="output"></pre>
             <p id="statBrut"></p>
         </section>
 
@@ -103,10 +103,11 @@
                 <div class="Film-similaire" id="display-title"></div>
                 <div class="Film-similaire" id="display-catégorie"></div>
 
-                <label for="valeurK">Nombre de films similaires :</label>
-                <input type="number" id="valeurK" value="5" min="1" class="cache">
-
-                <div id="display-knn"></div>
+                <div class="reco-k-controls">
+                    <label for="valeurK">Nombre de films similaires</label>
+                    <input type="number" id="valeurK" value="5" min="1">
+                </div>
+                <div class="Film-similaire" id="display-knn-results"></div>
             </div>
         </section>
 

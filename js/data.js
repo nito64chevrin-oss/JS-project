@@ -180,9 +180,45 @@ export function kNN(dataset, filmCible, k, features) {
   return tab.slice(1, k + 1) 
 }
 
+function getMovieTitle(movie) {
+  return String(movie?.titre ?? movie?.title ?? '').trim()
+}
+
+function getFeatureValue(movie, feature) {
+  const aliases = {
+    note: ['note', 'rating'],
+    rating: ['rating', 'note'],
+    duree: ['duree', 'duration'],
+    duration: ['duration', 'duree'],
+    annee: ['annee', 'year'],
+    year: ['year', 'annee'],
+    budget: ['budget']
+  }
+
+  const keys = aliases[feature] || [feature]
+  for (const key of keys) {
+    const value = Number(movie?.[key])
+    if (Number.isFinite(value)) {
+      return value
+    }
+  }
+
+  return 0
+}
+
+function toLegacyNumericMovie(movie) {
+  return {
+    titre: getMovieTitle(movie),
+    note: getFeatureValue(movie, 'note'),
+    duree: getFeatureValue(movie, 'duree'),
+    annee: getFeatureValue(movie, 'annee'),
+    budget: getFeatureValue(movie, 'budget')
+  }
+}
+
 export function rechercherFilms(dataset, recherche) {
   return dataset.filter(film =>
-    film.titre.toLowerCase().startsWith(recherche.toLowerCase())
+    getMovieTitle(film).toLowerCase().startsWith(recherche.toLowerCase())
   )
 }
 
@@ -247,11 +283,11 @@ export function DisplayAllMovies(dataset) {
   document.getElementById('display-films').innerHTML = ''
   for (let i = 0; i < dataset.length; i++) {
     const bouton = document.createElement('button')
-    bouton.textContent = dataset[i].titre
+    bouton.textContent = getMovieTitle(dataset[i])
     bouton.id = `btn-film-${i}`
     bouton.addEventListener('click', () => {
       window.filmCibleActuel = dataset[i]
-      document.getElementById('display-title').innerHTML = `<h3>Film sélectionné : ${window.filmCibleActuel.titre}</h3>`
+      document.getElementById('display-title').innerHTML = `<h3>Film sélectionné : ${getMovieTitle(window.filmCibleActuel)}</h3>`
       ExhibitKNN(dataset, window.filmCibleActuel)
     })
     document.getElementById('display-films').appendChild(bouton)
@@ -259,18 +295,25 @@ export function DisplayAllMovies(dataset) {
 }
 
 export function ExhibitKNN(dataset, filmCible) {
+  if (!Array.isArray(dataset) || dataset.length < 2 || !filmCible) {
+    document.getElementById('display-knn').innerHTML = '<p>Pas assez de donnees pour le KNN.</p>'
+    return
+  }
+
   document.getElementById('display-knn').innerHTML = ''
   document.getElementById('valeurK').classList.remove('cache')
   document.getElementById('valeurK').max = dataset.length - 1
 
   const k        = parseInt(document.getElementById('valeurK').value)
   const features = ["note", "duree", "annee", "budget"]
-  const resultats = kNN(dataset, filmCible, k, features)
+  const normalizedDataset = dataset.map(toLegacyNumericMovie)
+  const normalizedTarget = toLegacyNumericMovie(filmCible)
+  const resultats = kNN(normalizedDataset, normalizedTarget, k, features)
 
-  document.getElementById('display-knn').innerHTML = `<h3>Films similaires à ${filmCible.titre}</h3>`
+  document.getElementById('display-knn').innerHTML = `<h3>Films similaires à ${getMovieTitle(filmCible)}</h3>`
   for (let res of resultats) {
     document.getElementById('display-knn').innerHTML += `
-      <p>${res["film"].titre} — distance : ${res["distance"].toFixed(2)}</p>
+      <p>${getMovieTitle(res["film"])} — distance : ${res["distance"].toFixed(2)}</p>
     `
   }
 }

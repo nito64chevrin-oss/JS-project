@@ -10,9 +10,12 @@ const btnExportFilteredJSON = document.getElementById('btnExportFilteredJSON');
 const btnExportAnalysisJSON = document.getElementById('btnExportAnalysisJSON');
 const btnExportStatsCSV = document.getElementById('btnExportStatsCSV');
 
-const sortieURL = document.getElementById('test');
-const sortieTexte = document.getElementById('test2');
-const sortieFichier = document.getElementById('testfile');
+const sortieURL = document.getElementById('resultURL') || document.getElementById('test');
+const sortieTexte = document.getElementById('resultTexte') || document.getElementById('test2');
+const sortieFichier = document.getElementById('resultFichier') || document.getElementById('testfile');
+const affichageURL = sortieURL;
+const affichageTexte = sortieTexte;
+const affichageFichier = sortieFichier;
 const topActionBar = document.getElementById('topActionBar');
 const topStatsBar = document.getElementById('topStatsBar');
 const statTotalFilms = document.getElementById('statTotalFilms');
@@ -28,11 +31,21 @@ const messageBox = document.getElementById('messageBox');
 const listeFilms = document.getElementById('display-films');
 const sortieRecoTitre = document.getElementById('display-title');
 const sortieRecoCategorie = document.getElementById('display-catégorie');
+const sortieRecoKnnResults = document.getElementById('display-knn-results');
+const inputValeurK = document.getElementById('valeurK');
 const resultatRecherche = document.getElementById('resultatRecherche');
 
 let currentDataset = [];
 let currentFilteredDataset = [];
 let currentAnalysis = null;
+let dataset = [];
+let currentSelectedMovie = null;
+
+function getRecommendationK() {
+  const raw = Number(inputValeurK?.value || 5);
+  const maxAllowed = Math.max(1, currentDataset.length - 1);
+  return Math.max(1, Math.min(maxAllowed, Number.isFinite(raw) ? Math.floor(raw) : 5));
+}
 
 async function loadFromURL(url) {
   const response = await fetch(url);
@@ -83,6 +96,10 @@ function parseCSV(csv) {
   return result;
 }
 
+function parserCSV(csv) {
+  return parseCSV(csv);
+}
+
 function parseTextInput(rawText) {
   const input = rawText.trim();
   if (!input) throw new Error('Aucun texte fourni');
@@ -95,10 +112,23 @@ function parseTextInput(rawText) {
   }
 }
 
+function loadFromText(rawText) {
+  return parseTextInput(rawText);
+}
+
 function isURL(text) {
   try {
     new URL(text);
     return true;
+  } catch {
+    return false;
+  }
+}
+
+function estUneURL(texte) {
+  try {
+    const url = new URL(texte);
+    return url.protocol === 'https:' || url.protocol === 'http:';
   } catch {
     return false;
   }
@@ -261,11 +291,56 @@ function applyThemeFromStorage() {
   }
 }
 
+function computeFeatureRanges(data, features) {
+  const ranges = {};
+
+  features.forEach((feature) => {
+    const values = data
+      .map((movie) => Number(movie?.[feature]))
+      .filter((value) => Number.isFinite(value));
+
+    const min = values.length ? Math.min(...values) : 0;
+    const max = values.length ? Math.max(...values) : 0;
+    ranges[feature] = { min, max };
+  });
+
+  return ranges;
+}
+
+function computeNormalizedDistance(movieA, movieB, ranges, features) {
+  let sum = 0;
+
+  features.forEach((feature) => {
+    const aRaw = Number(movieA?.[feature]);
+    const bRaw = Number(movieB?.[feature]);
+    const a = Number.isFinite(aRaw) ? aRaw : 0;
+    const b = Number.isFinite(bRaw) ? bRaw : 0;
+    const { min, max } = ranges[feature] || { min: 0, max: 0 };
+    const denom = max - min;
+
+    if (denom <= 0) return;
+
+    const aNorm = (a - min) / denom;
+    const bNorm = (b - min) / denom;
+    const diff = aNorm - bNorm;
+    sum += diff * diff;
+  });
+
+  return Math.sqrt(sum);
+}
+
 function updateRecommendations(data) {
   currentDataset = Array.isArray(data) ? data : [];
   currentFilteredDataset = [...currentDataset];
+  currentSelectedMovie = null;
 
-  if (!listeFilms || !sortieRecoTitre || !sortieRecoCategorie) return;
+  if (!listeFilms || !sortieRecoTitre || !sortieRecoCategorie || !sortieRecoKnnResults) return;
+
+  if (inputValeurK) {
+    inputValeurK.classList.remove('cache');
+    inputValeurK.max = String(Math.max(1, currentDataset.length - 1));
+    inputValeurK.value = String(Math.min(getRecommendationK(), Math.max(1, currentDataset.length - 1)));
+  }
 
   listeFilms.innerHTML = '';
   
@@ -273,6 +348,7 @@ function updateRecommendations(data) {
   const statsHTML = renderStatsBlock(statsAllFilms, `Statistiques globales (${currentDataset.length} films)`, 'global-stats');
   sortieRecoTitre.innerHTML = statsHTML + '<p>Selectionne un film pour voir des recommandations.</p>';
   sortieRecoCategorie.innerHTML = '';
+  sortieRecoKnnResults.innerHTML = '';
 
   currentDataset.slice(0, 30).forEach((movie) => {
     const btn = document.createElement('button');
@@ -285,17 +361,25 @@ function updateRecommendations(data) {
 }
 
 function showRecommendationsFor(selectedMovie) {
-  if (!sortieRecoTitre || !sortieRecoCategorie) return;
+  if (!sortieRecoTitre || !sortieRecoCategorie || !sortieRecoKnnResults) return;
+  currentSelectedMovie = selectedMovie;
+  const k = getRecommendationK();
+  const knnFeatures = ['rating', 'duration', 'year', 'budget'];
+  const featureRanges = computeFeatureRanges(currentDataset, knnFeatures);
 
   const byGenre = currentDataset
     .filter((movie) => movie.title !== selectedMovie.title && movie.genre === selectedMovie.genre)
     .sort((a, b) => b.rating - a.rating)
-    .slice(0, 5);
+    .slice(0, k);
 
-  const closeInRating = currentDataset
+  const nearestByDistance = currentDataset
     .filter((movie) => movie.title !== selectedMovie.title)
-    .sort((a, b) => Math.abs(a.rating - selectedMovie.rating) - Math.abs(b.rating - selectedMovie.rating))
-    .slice(0, 5);
+    .map((movie) => ({
+      movie,
+      distance: computeNormalizedDistance(selectedMovie, movie, featureRanges, knnFeatures),
+    }))
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, k);
 
   sortieRecoTitre.innerHTML = `<h4>Film choisi: ${selectedMovie.title}</h4>`;
 
@@ -303,16 +387,22 @@ function showRecommendationsFor(selectedMovie) {
     ? byGenre.map((m) => `<li>${m.title} (${m.genre}, note ${m.rating})</li>`).join('')
     : '<li>Aucune recommandation de meme genre.</li>';
 
-  const ratingList = closeInRating.length
-    ? closeInRating.map((m) => `<li>${m.title} (note ${m.rating})</li>`).join('')
-    : '<li>Aucune recommandation proche en note.</li>';
+  const knnList = nearestByDistance.length
+    ? nearestByDistance
+      .map((item) => `<li>${item.movie.title} (${item.movie.genre}, note ${item.movie.rating}) - distance ${item.distance.toFixed(3)}</li>`)
+      .join('')
+    : '<li>Aucune recommandation KNN disponible.</li>';
 
   sortieRecoCategorie.innerHTML = `
     <h4>Suggestions par genre</h4>
     <ul>${genreList}</ul>
-    <h4>Suggestions par note proche</h4>
-    <ul>${ratingList}</ul>
   `;
+
+  sortieRecoKnnResults.innerHTML = `
+    <h4>Suggestions de film similaire</h4>
+    <ul>${knnList}</ul>
+  `;
+
 }
 
 function afficherDonneesFilms(films) {
@@ -511,6 +601,10 @@ function calculerStatsFilms(films) {
 function applyDataset(rawData, outputElement) {
   const cleanData = cleanDataset(rawData);
   outputElement.textContent = JSON.stringify(cleanData, null, 2);
+  dataset = cleanData;
+  window.dataset = cleanData;
+  window.currentDataset = cleanData;
+  window.filmCibleActuel = null;
   currentAnalysis = buildAnalysis(cleanData);
   currentFilteredDataset = [...cleanData];
   renderTopStats(cleanData);
@@ -695,5 +789,13 @@ if (boutonRecherche) {
 
     sortieRecoTitre.innerHTML = `<h4>Films trouves (${resultats.length})</h4>${statsHTML}<div class="choice">${listeHTML}</div>`;
     sortieRecoCategorie.innerHTML = '';
+  });
+}
+
+if (inputValeurK) {
+  inputValeurK.addEventListener('input', () => {
+    if (currentSelectedMovie) {
+      showRecommendationsFor(currentSelectedMovie);
+    }
   });
 }

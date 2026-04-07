@@ -66,13 +66,16 @@ function createHistogram(data) {
 
   container.innerHTML = bins
     .map((count, idx) => {
-      const height = Math.round((count / maxCount) * 100);
+      const ratio = (count / maxCount) * 100;
+      const height = count === 0 ? 0 : Math.max(10, Math.round(ratio));
       const label = `${idx}-${idx + 1}`;
 
       return `
         <div class="hist-bin">
-          <div class="hist-bar" style="height: ${height}%" title="${label} : ${count} films"></div>
           <span class="hist-count">${count}</span>
+          <div class="hist-track" title="${label} : ${count} films">
+            <div class="hist-bar ${count === 0 ? 'is-zero' : ''}" style="height: ${height}%"></div>
+          </div>
           <span class="hist-label">${label}</span>
         </div>
       `;
